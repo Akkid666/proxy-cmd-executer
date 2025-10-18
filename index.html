@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Proxy Command Sender</title>
+</head>
+<body>
+<h1>Send Command to Proxy</h1>
+<form id="commandForm">
+  <label for="commandInput">Enter Command:</label>
+  <input type="text" id="commandInput" name="command" required />
+  <button type="submit">Send</button>
+</form>
+
+<script>
+  document.getElementById('commandForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const command = document.getElementById('commandInput').value;
+
+    fetch('/send-command', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ command: command })
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert('Response: ' + data.message);
+    })
+    .catch(error => {
+      alert('Error sending command');
+      console.error('Error:', error);
+    });
+  });
+</script>
+</body>
+</html>
