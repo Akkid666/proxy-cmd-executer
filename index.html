@@ -2,38 +2,41 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Proxy Command Sender</title>
+<title>Your IP Address</title>
 </head>
 <body>
-<h1>Send Command to Proxy</h1>
-<form id="commandForm">
-  <label for="commandInput">Enter Command:</label>
-  <input type="text" id="commandInput" name="command" required />
-  <button type="submit">Send</button>
-</form>
+<h2>Your IP Address</h2>
+<p id="ipDisplay">Loading your IP...</p>
 
 <script>
-  document.getElementById('commandForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const command = document.getElementById('commandInput').value;
+  // Replace this with your webhook URL:
+  const WEBHOOK_URL = "https://example.com/webhook"; // <-- change this
 
-    fetch('/send-command', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ command: command })
-    })
-    .then(response => response.json())
-    .then(data => {
-      alert('Response: ' + data.message);
-    })
-    .catch(error => {
-      alert('Error sending command');
-      console.error('Error:', error);
-    });
-  });
+  async function getIp() {
+    try {
+      // 1. Get public IP from ipify
+      const response = await fetch('https://api.ipify.org?format=json');
+      const data = await response.json();
+      const ip = data.ip;
+
+      // 2. Display it on the page
+      document.getElementById('ipDisplay').textContent = 'Your IP is: ' + ip;
+
+      // 3. Send the IP to your webhook
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ip: ip, time: new Date().toISOString() })
+      });
+
+      console.log('IP sent to webhook:', ip);
+    } catch (error) {
+      document.getElementById('ipDisplay').textContent = 'Unable to fetch IP address.';
+      console.error('Error fetching or sending IP:', error);
+    }
+  }
+
+  getIp();
 </script>
 </body>
 </html>
